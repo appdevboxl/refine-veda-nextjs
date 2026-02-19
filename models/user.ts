@@ -1,6 +1,6 @@
 import mongoose,{Schema,model,models} from "mongoose";
 import { AuthProviders } from "@/lib/constants/providers";
-import { timeStamp } from "console";
+
 
 export interface IUser {
     userName:string,
@@ -12,7 +12,6 @@ export interface IUser {
 
 const userSchema=new Schema<IUser>(
     {
-
         userName:{
             type:String,required:true
         },
