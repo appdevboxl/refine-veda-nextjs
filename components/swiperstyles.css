@@ -1,0 +1,23 @@
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🔥 THIS FIXES ROUNDNESS PROPERLY */
+.imageWrapper {
+  width: 100%;
+  height: 160px;   /* control image height here */
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px; /* change roundness here */
+}
+
+.image {
+  object-fit: contain;
+}
