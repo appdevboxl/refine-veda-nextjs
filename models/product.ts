@@ -13,7 +13,7 @@ export interface IProduct {
     price: number;
     defaultVisible: boolean;
     units: number;
-    imageUrl?: string[];
+    imageUrl?: string;
   }[];
 }
 
@@ -38,7 +38,7 @@ const productVariantSchema = new Schema(
     },
 
     imageUrl: {
-      type: [String],
+      type: String,
     },
   },
   { _id: false }

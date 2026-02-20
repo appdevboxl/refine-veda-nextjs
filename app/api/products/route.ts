@@ -75,39 +75,41 @@ export async function POST(req: NextRequest) {
     const variantImageFiles: Record<number, File> = {};
 
     for (const [key, value] of formData.entries()) {
+      // ── Check image file FIRST so the scalar `continue` doesn't swallow it ──
+      // variants[0][imageUrl] also matches \w+ in the scalar regex, so we must
+      // short-circuit here before reaching that branch.
+      const imgMatch = key.match(/^variants\[(\d+)\]\[imageUrl\]$/);
+      if (imgMatch && value instanceof File && value.size > 0) {
+        variantImageFiles[Number(imgMatch[1])] = value;
+        continue;
+      }
 
+      // ── Scalar variant fields: variants[0][quantity], etc. ──
       const scalarMatch = key.match(/^variants\[(\d+)\]\[(\w+)\]$/);
       if (scalarMatch) {
         const idx = Number(scalarMatch[1]);
         const field = scalarMatch[2];
         if (!variantsMap[idx]) variantsMap[idx] = {};
         variantsMap[idx][field] = value as string;
-        continue;
-      }
-
-      // Variant image files: variants[0][imageUrl]
-      const imgMatch = key.match(/^variants\[(\d+)\]\[imageUrl\]$/);
-      if (imgMatch && value instanceof File && value.size > 0) {
-        const idx = Number(imgMatch[1]);
-        // if (!variantImageFiles[idx]) variantImageFiles[idx] = "";
-        variantImageFiles[idx] = value;
       }
     }
 
     const variants = await Promise.all(
       Object.entries(variantsMap).map(async ([idxStr, v]) => {
         const idx = Number(idxStr);
-        const files = variantImageFiles[idx] ?? "";
+        const file = variantImageFiles[idx] ?? null;
 
-        console.log(files)
-        const imageUrls: string = await uploadToCloudinary(files, "rigveda-variants");
+        // Only upload when a file was actually provided
+        const imageUrl: string | undefined = file
+          ? await uploadToCloudinary(file, "rigveda-variants")
+          : undefined;
 
         return {
           quantity: Number(v.quantity),
           price: Number(v.price),
           units: Number(v.units),
           defaultVisible: v.defaultVisible === "true",
-          imageUrl: imageUrls,
+          ...(imageUrl && { imageUrl }),
         };
       })
     );
