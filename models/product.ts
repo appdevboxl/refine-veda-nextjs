@@ -1,11 +1,13 @@
 import mongoose, { Schema, model, models } from "mongoose";
-import { MEASURING_UNITS, MeasuringUnit } from "@/lib/constants/measuringunits";
-import { PRODUCT_CATEGORY_VALUES} from "@/lib/constants/categories";
+import { MEASURING_UNITS, MeasuringUnit, MEASURING_UNIT_VALUES } from "@/lib/constants/measuringunits";
+import { PRODUCT_CATEGORY_VALUES } from "@/lib/constants/categories";
 
 export interface IProduct {
   name: string;
   measuringUnit: MeasuringUnit;
   category: string;
+  description: string,
+  images: string[],
   variants: {
     quantity: number;
     price: number;
@@ -34,6 +36,7 @@ const productVariantSchema = new Schema(
       type: Number,
       required: true,
     },
+
     imageUrl: {
       type: [String],
     },
@@ -50,10 +53,14 @@ const productSchema = new Schema<IProduct>(
     measuringUnit: {
       type: String,
       required: true,
-      enum: MEASURING_UNITS,
+      enum: MEASURING_UNIT_VALUES,
     },
     variants: {
       type: [productVariantSchema],
+      required: true,
+    },
+    images: {
+      type: [String],
       required: true,
     },
     category: {
